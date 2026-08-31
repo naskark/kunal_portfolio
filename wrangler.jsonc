@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kunal-portfolio",
+  "compatibility_date": "2026-09-01",
+  // No "main" entrypoint: this is an assets-only project, so requests are
+  // served directly from the CDN without invoking a Worker.
+  "assets": {
+    "directory": "./out",
+    "not_found_handling": "404-page"
+  }
+}
