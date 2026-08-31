@@ -1,26 +1,181 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --color-navy-950: #00061f;
+  --color-navy-900: #000a36;
+  --color-navy-800: #04123f;
+  --color-navy-700: #0a1c52;
+  --color-navy-600: #142a6b;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-ice: #ffffff;
+  --color-mist: #c3cbe6;
+  --color-muted: #8792b8;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-electric: #4f7cff;
+  --color-cyan: #22d3ee;
+  --color-violet: #a78bfa;
+
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
+
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-shimmer: shimmer 3s linear infinite;
+  --animate-pulse-ring: pulse-ring 3s ease-out infinite;
+  --animate-sway: sway 6.5s ease-in-out infinite;
+
+  @keyframes sway {
+    0%,
+    100% {
+      rotate: -2.2deg;
+    }
+    50% {
+      rotate: 2.2deg;
+    }
   }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-14px);
+    }
+  }
+
+  @keyframes shimmer {
+    from {
+      background-position: 200% center;
+    }
+    to {
+      background-position: -200% center;
+    }
+  }
+
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(0.85);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(1.9);
+      opacity: 0;
+    }
+  }
+}
+
+:root {
+  --background: #000a36;
+  --foreground: #ffffff;
+  color-scheme: dark;
+}
+
+* {
+  border-color: color-mix(in oklab, var(--color-ice) 8%, transparent);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Lenis drives scrolling on pointer devices; native smooth scroll would fight it. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+html.lenis {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-electric) 60%, transparent);
+  color: #fff;
+}
+
+/* Slim futuristic scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #00061f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-electric), var(--color-violet));
+  border-radius: 999px;
+}
+
+@utility text-gradient {
+  background: linear-gradient(
+    100deg,
+    #ffffff 0%,
+    #7fe9ff 35%,
+    #d9f6ff 60%,
+    #ffffff 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: var(--animate-shimmer);
+}
+
+@utility glass {
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklab, var(--color-ice) 8%, transparent),
+    color-mix(in oklab, var(--color-ice) 2%, transparent)
+  );
+  backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--color-ice) 10%, transparent);
+}
+
+@utility grid-lines {
+  background-image: linear-gradient(
+      to right,
+      color-mix(in oklab, var(--color-ice) 4%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--color-ice) 4%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 64px 64px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kunal Naskar — Portfolio
 
-## Getting Started
+An animated, single-page portfolio built with Next.js 16, Tailwind CSS v4 and Motion.
 
-First, run the development server:
+## Requirements
+
+Next.js 16 requires Node.js >= 20.9. The version is pinned in `.nvmrc`:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+nvm use
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Getting started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The site runs at http://localhost:3000.
 
-## Learn More
+Other scripts:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build   # production build (fully static)
+npm run start   # serve the production build
+npm run lint    # eslint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## What's in it
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Single-page app** with six sections (`home`, `about`, `experience`, `work`, `skills`, `contact`) and Lenis-powered smooth scrolling.
+- **Interactive background** — a canvas particle constellation that reacts to the pointer: hover to repel and link nodes, hold to attract, click to fire a shockwave ripple.
+- **Animated navbar** with a shared-layout active pill, scroll-progress bar, and a full-screen animated mobile menu.
+- **Slide decks** — the experience section is a tabbed slide deck; the work section is a draggable/swipeable 3D card carousel.
+- **Custom cursor** on fine-pointer devices, magnetic buttons, scroll-reveal and stagger animations throughout.
+- Fully responsive, and all motion is disabled under `prefers-reduced-motion`.
 
-## Deploy on Vercel
+## Content
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+All portfolio content lives in `src/data/portfolio.ts` as typed data. Edit that file to update text — no component changes needed.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contact form
+
+The form submits to [Web3Forms](https://web3forms.com), which delivers the enquiry to the inbox you registered when creating the key.
+
+To switch it on:
+
+1. Get a free access key at https://web3forms.com by entering your email — the key is emailed to you.
+2. `cp .env.example .env.local` and set `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY`.
+3. Restart the dev server.
+
+Submission happens in the browser, in `sendContactMessage` (`src/lib/portfolio-service.ts`). This is required rather than preferred: Web3Forms' free plan rejects server-side requests with "Pro plan is required", so a Next.js route handler cannot proxy it. The consequence is that the access key is visible in the client bundle — by design for Web3Forms, since the key only permits sending mail to your own inbox. Rotate it in their dashboard if it is ever abused.
+
+Before sending, the client validates that all fields are present, checks the email format, enforces length limits, and passes Web3Forms' `botcheck` honeypot. Success is reported **only** when Web3Forms confirms it; if the key is missing or the request fails, the visitor is told to email you directly instead.
+
+If you would rather the key not be public, the alternatives are Web3Forms Pro (which allows server-side calls) or a provider such as [Resend](https://resend.com) behind a Next.js route handler.
+
+## Adding a backend later
+
+The UI never imports the data file directly; it goes through `src/lib/portfolio-service.ts`, which is the single seam between the UI and the content source. To switch from static data to live APIs, set:
+
+```bash
+NEXT_PUBLIC_PORTFOLIO_API_URL=https://api.example.com
+```
+
+The service then reads `GET /portfolio` and posts the contact form to `POST /contact`, falling back to the bundled static data if a request fails. Response shapes are the types exported from `src/data/portfolio.ts`.
+
+## Colours
+
+Built on `#000A36` (navy) and white, with cyan / electric blue / violet accents defined as Tailwind theme tokens in `src/app/globals.css`.
