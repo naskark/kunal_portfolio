@@ -92,7 +92,7 @@ export default function Contact({ data }: { data: PortfolioData }) {
   return (
     <SectionShell
       id="contact"
-      index="05"
+      index="06"
       eyebrow="Contact"
       title={
         <>

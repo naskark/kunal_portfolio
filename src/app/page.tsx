@@ -9,6 +9,7 @@ import About from "@/components/sections/About";
 import Experience from "@/components/sections/Experience";
 import Work from "@/components/sections/Work";
 import Skills from "@/components/sections/Skills";
+import Blogs from "@/components/sections/Blogs";
 import Contact from "@/components/sections/Contact";
 import Footer from "@/components/Footer";
 
@@ -29,6 +30,7 @@ export default async function Home() {
         <Experience data={data} />
         <Work data={data} />
         <Skills data={data} />
+        <Blogs />
         <Contact data={data} />
       </main>
 

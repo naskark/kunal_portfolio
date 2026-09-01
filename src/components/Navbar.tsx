@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   AnimatePresence,
   motion,
@@ -10,16 +11,26 @@ import {
 } from "motion/react";
 import { scrollToSection } from "@/components/SmoothScroll";
 
-export const NAV_LINKS = [
+export type NavLink = {
+  id: string;
+  label: string;
+  /** When set, navigates to a route instead of scrolling a home section. */
+  href?: string;
+};
+
+export const NAV_LINKS: NavLink[] = [
   { id: "home", label: "Home" },
   { id: "about", label: "About" },
   { id: "experience", label: "Experience" },
   { id: "work", label: "Work" },
   { id: "skills", label: "Skills" },
+  { id: "blogs", label: "Blogs", href: "/blogs" },
   { id: "contact", label: "Contact" },
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const router = useRouter();
   const { scrollYProgress, scrollY } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.3 });
 
@@ -29,6 +40,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const lastScrollY = useRef(0);
   const keepVisibleUntil = useRef(0);
+  const onHome = pathname === "/";
+  const highlighted = pathname?.startsWith("/blogs") ? "blogs" : active;
 
   useMotionValueEvent(scrollY, "change", (value) => {
     setScrolled(value > 40);
@@ -50,6 +63,8 @@ export default function Navbar() {
   });
 
   useEffect(() => {
+    if (!onHome) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
@@ -65,7 +80,7 @@ export default function Navbar() {
       if (el) observer.observe(el);
     }
     return () => observer.disconnect();
-  }, []);
+  }, [onHome]);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -74,12 +89,23 @@ export default function Navbar() {
     };
   }, [menuOpen]);
 
-  const go = (id: string) => {
+  const go = (link: NavLink) => {
     setMenuOpen(false);
     setHidden(false);
     keepVisibleUntil.current = Date.now() + 1600;
+
+    if (link.href) {
+      router.push(link.href);
+      return;
+    }
+
+    if (!onHome) {
+      router.push(`/#${link.id}`);
+      return;
+    }
+
     // Let the overlay unmount before Lenis takes over the scroll.
-    requestAnimationFrame(() => scrollToSection(id));
+    requestAnimationFrame(() => scrollToSection(link.id));
   };
 
   return (
@@ -103,7 +129,7 @@ export default function Navbar() {
         >
           <nav className="mx-auto flex h-18 max-w-7xl items-center justify-between px-5 sm:px-8">
             <button
-              onClick={() => go("home")}
+              onClick={() => go({ id: "home", label: "Home" })}
               className="group flex items-center gap-3"
               aria-label="Back to top"
             >
@@ -125,10 +151,10 @@ export default function Navbar() {
               {NAV_LINKS.map((link) => (
                 <button
                   key={link.id}
-                  onClick={() => go(link.id)}
-                  className="relative rounded-full px-4 py-2 text-sm font-medium text-mist/75 transition-colors duration-300 hover:text-ice"
+                  onClick={() => go(link)}
+                  className="relative rounded-full px-3.5 py-2 text-sm font-medium text-mist/75 transition-colors duration-300 hover:text-ice xl:px-4"
                 >
-                  {active === link.id ? (
+                  {highlighted === link.id ? (
                     <motion.span
                       layoutId="nav-pill"
                       className="absolute inset-0 rounded-full bg-gradient-to-r from-electric/30 to-violet/25 ring-1 ring-cyan/30 ring-inset"
@@ -136,7 +162,7 @@ export default function Navbar() {
                     />
                   ) : null}
                   <span
-                    className={`relative z-10 ${active === link.id ? "text-ice" : ""}`}
+                    className={`relative z-10 ${highlighted === link.id ? "text-ice" : ""}`}
                   >
                     {link.label}
                   </span>
@@ -146,7 +172,7 @@ export default function Navbar() {
 
             <div className="flex items-center gap-3">
               <button
-                onClick={() => go("contact")}
+                onClick={() => go({ id: "contact", label: "Contact" })}
                 className="group relative hidden overflow-hidden rounded-full px-5 py-2.5 text-sm font-semibold text-navy-900 sm:block"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-cyan via-ice to-cyan bg-[length:200%_auto] transition-[background-position] duration-700 group-hover:bg-right" />
@@ -202,7 +228,7 @@ export default function Navbar() {
                     duration: 0.45,
                     ease: [0.22, 1, 0.36, 1],
                   }}
-                  onClick={() => go(link.id)}
+                  onClick={() => go(link)}
                   className="group flex w-full items-baseline gap-4 border-b border-ice/8 py-4 text-left"
                 >
                   <span className="font-mono text-xs text-cyan/70">
@@ -210,7 +236,7 @@ export default function Navbar() {
                   </span>
                   <span
                     className={`text-3xl font-semibold tracking-tight transition-colors ${
-                      active === link.id ? "text-cyan" : "text-ice"
+                      highlighted === link.id ? "text-cyan" : "text-ice"
                     }`}
                   >
                     {link.label}
@@ -224,7 +250,7 @@ export default function Navbar() {
               transition={{ delay: 0.5 }}
               className="relative mt-10 font-mono text-xs tracking-[0.2em] text-mist/50 uppercase"
             >
-              Pune, India · Available for work
+              Pune, India
             </motion.p>
           </motion.div>
         ) : null}
