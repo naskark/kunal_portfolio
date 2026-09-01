@@ -44,7 +44,7 @@ export default function Hero({ data }: { data: PortfolioData }) {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan opacity-75" />
             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan" />
           </span>
-          {profile.location} · Open to opportunities
+          {profile.location}
         </motion.div>
 
         <h1 className="mt-6 text-[clamp(2.25rem,6vw,4.75rem)] leading-[1] font-semibold tracking-[-0.03em]">
